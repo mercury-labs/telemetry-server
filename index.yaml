@@ -3,11 +3,11 @@ entries:
   Metrics server:
   - apiVersion: v1
     appVersion: 0.0.1
-    created: "2024-02-18T20:44:14.455663852Z"
+    created: "2024-02-18T20:47:12.459042092Z"
     description: Metrics server
-    digest: 17f69b02879853dc3f0254ded92c5a805c14354b6d59ae1c45b4ddb390373e94
+    digest: 0fa0edb21ccea0bcfe386ab4ea22a6dfd68363bb409b83201439c384411f22d7
     name: Metrics server
     urls:
     - https://mercury-labs.github.io/telemetry-server/Metrics%20server-0.0.6.tgz
     version: 0.0.6
-generated: "2024-02-18T20:44:14.455321635Z"
+generated: "2024-02-18T20:47:12.458691318Z"
