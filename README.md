@@ -1,2 +1,2 @@
 # Telemetry Server
-HTTP server
+HTTP server emits structured logs using open-telemetry
