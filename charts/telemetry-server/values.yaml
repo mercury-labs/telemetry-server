@@ -1,0 +1,17 @@
+common:
+global:
+  image:
+    pullSecret:
+  ingress:
+    className: nginx
+    hosts: []
+
+api_server:
+  replicas: 1
+  env:
+    UPTRACE_DSN:
+  resources:
+    limits:
+      cpu: 1
+    requests:
+      cpu: 1

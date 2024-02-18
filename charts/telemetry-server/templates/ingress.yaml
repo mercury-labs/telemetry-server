@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "metrics.fullname" . }}-web-server
+  annotations:
+    kubernetes.io/ingress.class: {{.Values.global.ingress.className}}
+spec:
+  ingressClassName: {{.Values.global.ingress.className}}
+  tls:
+    - hosts:
+      {{- range $key, $val := .Values.global.ingress.hosts }}
+      - {{ $val }}
+      {{- end }}
+      secretName: '{{.Values.global.ingress.secret_name}}'
+  rules:
+{{- $fullName := include "metrics.fullname" . -}}
+{{- range $key, $val := .Values.global.ingress.hosts }}
+    - host: {{ $val }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-api-server
+                port:
+                  number: 8000
+
+{{- end }}

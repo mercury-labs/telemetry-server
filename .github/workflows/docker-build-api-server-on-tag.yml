@@ -1,0 +1,29 @@
+name: Build and Push Backend Image on Tag
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+    paths:
+      - backend/**
+
+jobs:
+  build-and-push:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v4
+      - id: prepare
+        uses: ./.github/actions/prepare
+        with:
+          context: ./
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          repo: ${{vars.GOOGLE_REGION}}-docker.pkg.dev/${{ vars.CONTAINER_REPOSITORY }}/telemetry-server
+          tag: ${{ github.ref_name }}
+          registry: ${{vars.GOOGLE_REGION}}-docker.pkg.dev
+          gcp_credentials_file: ${{ secrets.GOOGLE_CREDENTIALS_FILE }}
+          gcp_project_id: ${{vars.GOOGLE_PROJECT_ID}}
+
+

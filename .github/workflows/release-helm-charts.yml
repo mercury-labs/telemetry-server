@@ -1,0 +1,68 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'charts/**'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Checkout destination
+        uses: actions/checkout@v3
+        with:
+          path: 'dist'
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Prepare docs
+        run: mkdir -p dist
+
+      - name: Converts Markdown to HTML
+        uses: jaywcjlove/markdown-to-html-cli@main
+        with:
+          source: README.md
+          output: dist/index.html
+
+      - name: Package Helm Charts
+        shell: bash
+        run: |
+          find charts/ -type f -name 'Chart.yaml' | sed -r 's|/[^/]+$||' | sort | uniq | xargs -L 1 helm dep up
+          for d in charts/*/ ; do
+           echo "$d"
+           helm package "$d" -u -d dist
+          done
+      - name: Build index
+        working-directory: dist
+        run: |
+          helm repo index . --url https://mercury-labs.github.io/telemetry-server/
+
+      - name: Deploy 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          keep_files: true
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        env:
+          CR_SKIP_EXISTING: true
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

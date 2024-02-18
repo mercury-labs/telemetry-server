@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "metrics.fullname" . }}-api-server
+spec:
+  replicas: {{ .Values.api_server.replicas }}
+  selector:
+    matchLabels:
+      name: {{ template "metrics.fullname" . }}-api-server
+  template:
+    metadata:
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+      labels:
+        name: {{ template "metrics.fullname" . }}-api-server
+    spec:
+     {{- if .Values.global.image.pullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.global.image.pullSecret }}
+     {{- end }}
+      containers:
+      - name: {{ template "metrics.fullname" . }}-api-server
+        image: "{{ .Values.global.image.tag }}"
+        imagePullPolicy: Always
+        command: ["./server"]
+        env:
+{{- range $name, $value := .Values.api_server.env }}
+{{- if not (empty $value) }}
+            - name: {{ $name | upper | quote }}
+              value: {{ $value | quote }}
+{{- end }}
+{{- end }}
+        resources:
+          limits:
+            cpu: {{ .Values.api_server.resources.limits.cpu }}
+            memory: {{ .Values.api_server.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.api_server.resources.requests.cpu }}
+            memory: {{ .Values.api_server.resources.requests.memory }}

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "metrics.fullname" . }}-api-server
+spec:
+  selector:
+    name: {{ template "metrics.fullname" . }}-api-server
+  ports:
+  - name: "http"
+    protocol: "TCP"
+    port: 8000
